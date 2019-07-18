@@ -30,10 +30,7 @@ class SplashViewController: UIViewController,BindableType {
     typealias ViewModelType = SplashViewModel
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Do any additional setup after loading the view.
         setupObservers()
-       
     }
     
     private func setupObservers() {
@@ -43,7 +40,6 @@ class SplashViewController: UIViewController,BindableType {
         }
     }
     // MARK: - Actions
-    
     private func presentLogIn() {
         guard let oauthURL = TraktManager.sharedManager.oauthURL else { return }
         

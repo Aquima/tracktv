@@ -18,23 +18,15 @@ class MovieTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
     }
-
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
     }
-   
     func loadWithData(_ movie:WrapperMovie){
         self.lblTitle.text = movie.title
         self.lblYearRelease.text = movie.year
         self.lblOverView.text = movie.overView
-          
-        guard let url = movie.url else {
-
-           return
-        }
-        self.imgPoster.sd_setImage(with: url, placeholderImage:nil)
-        
+        self.imgPoster.sd_setImage(with: movie.url, placeholderImage:UIImage.init(imageLiteralResourceName: "hintMovie.pdf"))
     }
 }
