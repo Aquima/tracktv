@@ -1,16 +1,13 @@
 //
-//  Moviesmovies.swift
+//  SearchMoviesState.swift
 //  TrackTV
 //
 //  Created by Raul on 7/12/19.
 //  Copyright © 2019 Raul Quispe. All rights reserved.
 //
 
-import UIKit
 import TraktKit
 import RxSwift
-import RxCocoa
-import RxDataSources
 import Foundation
 
 enum MoviesCommand {
@@ -23,15 +20,13 @@ struct SearchMoviesState {
     // control
     var searchText: String
     var shouldLoadNextPage: Bool
-    var movies: Version<[WraperMovie]> // Version is an optimization. When something unrelated changes, we don't want to reload table view.
-    var nextURL: URL?
+    var movies: Version<[WrapperMovie]> // Version is an optimization. When something unrelated changes, we don't want to reload table view.
     var failure: MoviesServiceError?
     
     init(searchText: String) {
         self.searchText = searchText
         shouldLoadNextPage = true
         movies = Version([])
-        nextURL = URL(string: "https://api.github.com/search/movies?q=\(searchText)")
         failure = nil
     }
 }
@@ -45,11 +40,10 @@ extension SearchMoviesState {
             return SearchMoviesState(searchText: text).mutateOne { $0.failure = state.failure }
         case .moviesResponseReceived(let result):
             switch result {
-            case let .success((movies, nextURL)):
+            case let .success((movies)):
                 return state.mutate {
                     $0.movies = Version($0.movies.value + movies)
                     $0.shouldLoadNextPage = false
-                    $0.nextURL = nextURL
                     $0.failure = nil
                 }
             case let .failure(error):
@@ -71,7 +65,6 @@ import RxCocoa
 struct GithubQuery: Equatable {
     let searchText: String;
     let shouldLoadNextPage: Bool;
-    let nextURL: URL?
 }
 
 /**
@@ -88,7 +81,7 @@ func searchMovies(
     
     let searchPerformerFeedback: (Driver<SearchMoviesState>) -> Signal<MoviesCommand> = react(
         query: { (state) in
-            GithubQuery(searchText: state.searchText, shouldLoadNextPage: state.shouldLoadNextPage, nextURL: state.nextURL)
+            GithubQuery(searchText: state.searchText, shouldLoadNextPage: state.shouldLoadNextPage)
     },
         effects: { query -> Signal<MoviesCommand> in
             if !query.shouldLoadNextPage {

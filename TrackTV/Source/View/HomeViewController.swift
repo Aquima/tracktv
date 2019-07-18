@@ -12,12 +12,12 @@ import RxCocoa
 import RxGesture
 import TraktKit
 import RxDataSources
-class WraperMovie: NSObject {
+class WrapperMovie: NSObject {
     var title:String!
     var imdb:String!
     var year:String!
     var overView:String!
-    var url:URL!
+    var url:URL? = nil
    
 }
 class HomeViewController: ViewController,BindableType, UITableViewDelegate {
@@ -30,8 +30,8 @@ class HomeViewController: ViewController,BindableType, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
-    let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, WraperMovie>>(
-        configureCell: { (_, tv, ip, movie: WraperMovie) in
+    let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, WrapperMovie>>(
+        configureCell: { (_, tv, ip, movie: WrapperMovie) in
             let cell = tv.dequeueReusableCell(withIdentifier: HomeViewController.itemId) as! MovieTableViewCell
             cell.separatorInset = .zero
 
@@ -73,8 +73,7 @@ class HomeViewController: ViewController,BindableType, UITableViewDelegate {
             searchText: searchBar.rx.text.orEmpty.changed.asSignal().throttle(.milliseconds(300)),
             loadNextPageTrigger: loadNextPageTrigger,
             performSearch: { query in
-    
-                TrackMoviesAPI.sharedAPI.searchMovies(query: query)
+                self.viewModel.getMovies(query)
                     .trackActivity(activityIndicator)
         })
 

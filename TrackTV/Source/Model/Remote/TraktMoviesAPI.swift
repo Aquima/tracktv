@@ -6,7 +6,6 @@
 //  Copyright © 2019 Raul Quispe. All rights reserved.
 //
 
-import UIKit
 import TraktKit
 import RxCocoa
 import RxSwift
@@ -17,7 +16,7 @@ enum MoviesServiceError: Error {
     case networkError
 }
 
-typealias SearchMoviesResponse = Result<(movies: [WraperMovie], nextURL: URL?), MoviesServiceError>
+typealias SearchMoviesResponse = Result<([WrapperMovie]), MoviesServiceError>
 class TrackMoviesAPI {
     
     static let sharedAPI = TrackMoviesAPI(reachabilityService: try! DefaultReachabilityService())
@@ -47,7 +46,7 @@ extension TrackMoviesAPI {
 
                     self.getObjectsMovies(movies: movies,completionMovie: {(moviews) in
                         DispatchQueue.main.async{
-                            observer.onNext(.success((movies: moviews, nextURL: URL.init(string: ""))))
+                            observer.onNext(.success(moviews))
                             observer.onCompleted()
                             TrackMoviesAPI.sharedAPI.paginationTrending = Pagination.init(page: TrackMoviesAPI.sharedAPI.paginationTrending.page + 1, limit: 10)
                         }
@@ -63,12 +62,12 @@ extension TrackMoviesAPI {
         }
         return observable.retryOnBecomesReachable(.failure(.offline), reachabilityService: _reachabilityService)
     }
-    public func getObjectsMovies(movies:[TraktMovie],completionMovie: @escaping ([WraperMovie]) -> Void){
+    public func getObjectsMovies(movies:[TraktMovie],completionMovie: @escaping ([WrapperMovie]) -> Void){
        
 
-            var wMovies = [WraperMovie]()
+            var wMovies = [WrapperMovie]()
             for itemMovie in movies {
-                let newMovie = WraperMovie()
+                let newMovie = WrapperMovie()
                 newMovie.title = itemMovie.title
                 
                 if itemMovie.ids.imdb != nil {
@@ -114,7 +113,7 @@ extension TrackMoviesAPI {
                         movies = objects.compactMap { $0.movie }
                         self.getObjectsMovies(movies: movies,completionMovie: {(moviews) in
                             DispatchQueue.main.async{
-                                observer.onNext(.success((movies: moviews, nextURL: URL.init(string: ""))))
+                                observer.onNext(.success(moviews))
                                 observer.onCompleted()
                                 TrackMoviesAPI.sharedAPI.paginationTrending = Pagination.init(page: TrackMoviesAPI.sharedAPI.paginationTrending.page + 1, limit: 10)
                             }
@@ -150,7 +149,7 @@ extension TrackMoviesAPI {
                 let decoder = JSONDecoder()
                 let imdbData = try decoder.decode(ImdbData.self, from: data)
                 if imdbData.Poster == nil {
-                     completion(URL(string: "https://m.media-amazon.com/images/M/MV5BMjAwODg3OTAxMl5BMl5BanBnXkFtZTcwMjg2NjYyMw@@.jpg")!, nil)
+                     completion(nil, nil)
                 }else{
                      completion(URL(string: imdbData.Poster!)!, nil)
                 }

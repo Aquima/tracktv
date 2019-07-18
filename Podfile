@@ -12,6 +12,7 @@ target 'TrackTV' do
   pod 'RxDataSources'
   pod 'TraktKit'
   pod 'SDWebImage'
+  pod 'Shimmer'
   target 'TrackTVTests' do
     inherit! :search_paths
     # Pods for testing

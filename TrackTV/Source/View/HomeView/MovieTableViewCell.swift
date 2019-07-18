@@ -8,9 +8,7 @@
 
 import UIKit
 import SDWebImage
-import RxSwift
-import RxCocoa
-
+import Shimmer
 class MovieTableViewCell: UITableViewCell {
     @IBOutlet var lblTitle:UILabel!
     @IBOutlet var lblYearRelease:UILabel!
@@ -27,11 +25,17 @@ class MovieTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
    
-    func loadWithData(_ movie:WraperMovie){
+    func loadWithData(_ movie:WrapperMovie){
         self.lblTitle.text = movie.title
-        self.imgPoster.sd_setImage(with: movie.url, placeholderImage:nil)
         self.lblYearRelease.text = movie.year
         self.lblOverView.text = movie.overView
+          self.addSubview(shimmeringView)
+        
+        guard let url = movie.url else {
+
+           return
+        }
+        self.imgPoster.sd_setImage(with: url, placeholderImage:nil)
         
     }
 }
