@@ -29,8 +29,7 @@ class MovieTableViewCell: UITableViewCell {
         self.lblTitle.text = movie.title
         self.lblYearRelease.text = movie.year
         self.lblOverView.text = movie.overView
-          self.addSubview(shimmeringView)
-        
+          
         guard let url = movie.url else {
 
            return
